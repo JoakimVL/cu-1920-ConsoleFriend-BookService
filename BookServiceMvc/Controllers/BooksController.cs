@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BookService.Lib.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -10,9 +11,12 @@ namespace BookServiceMvc.Controllers
 {
     public class BooksController : Controller
     {
+        string baseUri = "https://localhost:4200/api/books";
+
         public IActionResult Index()
         {
-            return View();
+            string bookUri = $"{baseUri}/basic";
+            return View(GetApiResult<List<BookBasicDto>>(bookUri));
         }
 
         public T GetApiResult<T>(string uri)
@@ -20,7 +24,9 @@ namespace BookServiceMvc.Controllers
             using (HttpClient httpClient = new HttpClient()) 
             { 
                 Task<String> response = httpClient.GetStringAsync(uri); 
-                return Task.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(response.Result)).Result; 
+                return Task.Factory.StartNew(
+                    () => JsonConvert.DeserializeObject<T>(response.Result)
+                    ).Result; 
             } 
         }
     }
